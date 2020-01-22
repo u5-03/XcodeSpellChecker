@@ -7,6 +7,7 @@ import Commander
 final class XcodeSpellChecker {
     func run(filePaths: String, ymlPath: String, language: String) {
         let XcodeSpellChecker = NSSpellChecker.shared
+        var whiteWordList: [String] = []
         var includePath: [String] = []
         var excludePath: [String] = []
         if filePaths.isEmpty {
@@ -15,12 +16,12 @@ final class XcodeSpellChecker {
         }
         if !ymlPath.isEmpty {
             let url = URL(fileURLWithPath: ymlPath)
-            guard let optionsParameters = parseYamlOptions(for: url) else {
+            guard let optionsParameters: YmlEntity = parseYaml(for: url) else {
                 print("Fail to parse yaml options.")
                 return
             }
             if let whiteList = optionsParameters.whiteList, !whiteList.isEmpty {
-                XcodeSpellChecker.setIgnoredWords(whiteList, inSpellDocumentWithTag: 0)
+                whiteWordList = whiteList
             }
             if let optionExcludePath = optionsParameters.excludePath {
                 excludePath = optionExcludePath
@@ -29,6 +30,7 @@ final class XcodeSpellChecker {
                 includePath = optionIncludePath
             }
         }
+        XcodeSpellChecker.setIgnoredWords(whiteWordList + DefaultWhiteList.list, inSpellDocumentWithTag: 0)
         let files = Commands.filePathArray(filePaths: filePaths, includePath: includePath, excludePath: excludePath)
         if !XcodeSpellChecker.setLanguage(language) {
             print("Language:\(language) is not supported.")
@@ -76,7 +78,7 @@ final class XcodeSpellChecker {
         }
     }
 
-    private func parseYamlOptions(for url: URL) -> YmlEntity? {
+    private func parseYaml<T>(for url: URL) -> T? where T: Decodable {
         let decoder = YAMLDecoder()
         guard let ymlString = try? String(contentsOf: url) else { return nil }
         return try? decoder.decode(from: ymlString)
