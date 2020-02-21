@@ -9,7 +9,7 @@ This tool for Xcode is to detect misspelling and show warnings to misspelling lo
 ## Recommended environment
 
 - Swift 5.1
-- Xcode 11.1
+- Xcode 11.3
 - macOS 10.15
 
 ## Install
@@ -48,7 +48,32 @@ do
   filePaths="$filePaths:$SRCROOT/$file"
 done
 
-XcodeSpellChecker --files $filePaths
+XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yaml --files $filePaths
+
+```
+
+Write to your `Run script` like a below code when using `Mint`. 
+
+```shellscript
+if mint list | [ -z `grep -p "XcodeSpellChecker"` ]; then
+    echo "XcodeSpellChecker not installed"
+    exit 1
+fi
+
+git_path=/usr/local/bin/git
+files=$($git_path diff --diff-filter=d --name-only -- "*.swift" "*.h" "*.m" "*.strings")
+if (test -z $files) || (test ${#files[@]} -eq 0); then
+  echo "No files changed."
+  exit 0
+fi
+
+filePaths=""
+for file in $files
+do
+  filePaths="$filePaths:$SRCROOT/$file"
+done
+
+mint run XcodeSpellChecker XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yaml --files $filePaths
 
 ```
 
@@ -60,8 +85,6 @@ For example:
 
 ```yaml
 whiteList:
-  - rx
-  - RxSwift
   - PersonName
   - CompanyName
 
@@ -71,8 +94,8 @@ includePath:
   - Assets/localizable.strings
 
 excludePath:
-- Frameworks/
-- Generated/
+  - Frameworks/
+  - Generated/
 ```
 The filters of `includePath` applied first, and those of `excludePath` applied after that.
 
