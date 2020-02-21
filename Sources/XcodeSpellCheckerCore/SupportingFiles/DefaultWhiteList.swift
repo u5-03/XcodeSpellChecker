@@ -24,6 +24,10 @@ public struct DefaultWhiteList {
         "stackoverflow",
         "swiftui",
         "apns",
-        "fcm"
+        "fcm",
+        "sdk",
+        "ios",
+        "swiftlint",
+        "Hashable"
     ]
 }
