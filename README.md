@@ -48,7 +48,7 @@ do
   filePaths="$filePaths:$SRCROOT/$file"
 done
 
-XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yaml --files $filePaths
+XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yml --files $filePaths
 
 ```
 
@@ -73,7 +73,7 @@ do
   filePaths="$filePaths:$SRCROOT/$file"
 done
 
-mint run XcodeSpellChecker XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yaml --files $filePaths
+mint run XcodeSpellChecker XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yml --files $filePaths
 
 ```
 
@@ -102,7 +102,7 @@ The filters of `includePath` applied first, and those of `excludePath` applied a
 And set `--yml` options.
 
 ```shellscript
-XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yaml --files $filePaths
+XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.yml --files $filePaths
 ```
 
 ## References

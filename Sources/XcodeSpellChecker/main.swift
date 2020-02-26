@@ -11,13 +11,13 @@ final class XcodeSpellChecker {
         var includePath: [String] = []
         var excludePath: [String] = []
         if filePaths.isEmpty {
-            print("File paths to be checked with spelling of words are not set")
+            print("XcodeSpellChecker: File paths to be checked with spelling of words are not set")
             return
         }
         if !ymlPath.isEmpty {
             let url = URL(fileURLWithPath: ymlPath)
             guard let optionsParameters: YmlEntity = parseYaml(for: url) else {
-                print("Fail to parse yaml options.")
+                print("XcodeSpellChecker: ⚠️Fail to parse yaml options. Check 'Xcode-spellChecker.yml' file in your project.")
                 return
             }
             if let whiteList = optionsParameters.whiteList, !whiteList.isEmpty {
@@ -33,7 +33,7 @@ final class XcodeSpellChecker {
         XcodeSpellChecker.setIgnoredWords(whiteWordList + DefaultWhiteList.list, inSpellDocumentWithTag: 0)
         let files = Commands.filePathArray(filePaths: filePaths, includePath: includePath, excludePath: excludePath)
         if !XcodeSpellChecker.setLanguage(language) {
-            print("Language:\(language) is not supported.")
+            print("XcodeSpellChecker: Language:\(language) is not supported.")
             return
         }
         let checkTargetList: [CheckType] = FileNameFinder().findFileName(fileArray: files)
@@ -46,9 +46,9 @@ final class XcodeSpellChecker {
             .compactMap({ $0 })
             .flatMap({ $0 })
             .map({ .word(word: $0) })
-        
+
         if checkTargetList.isEmpty {
-            print("The spell of all words/fileName is correct!")
+            print("XcodeSpellChecker: The spell of all words/fileName is correct!")
             return
         }
 
