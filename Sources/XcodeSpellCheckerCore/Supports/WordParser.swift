@@ -16,6 +16,8 @@ struct LineParser {
         var result: [WordEntity] = []
         let lines = string.split(separator: "\n", omittingEmptySubsequences: false)
         lines.enumerated().forEach { offset, line in
+            let trimmedLine = line.trimmingCharacters(in: .whitespaces)
+            if (trimmedLine.isEmpty || trimmedLine.hasPrefix("/*") || trimmedLine.hasSuffix("*/") || trimmedLine.hasPrefix("//")) { return }
             let wordFinder = WordFinder(sentence: String(line), url: url, line: offset)
             result.append(contentsOf: wordFinder.findWords())
         }
