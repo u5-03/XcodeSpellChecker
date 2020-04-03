@@ -52,57 +52,47 @@ final class XcodeSpellChecker {
             return
         }
 
-        var checkTargetDic: [String: CheckType] = [:]
+        var wordSearchTypeList: [String: WordSearchEntity] = [:]
+        var fileNameSearchTypeList: [String: FileNameSearchEntity] = [:]
         checkTargetList.forEach({
             switch $0 {
-            case .word(let word):
-                if checkTargetDic[word.value] == nil {
-                    checkTargetDic[word.value] = .word(word: word)
+            case .word(let wordEntity):
+                if wordSearchTypeList[wordEntity.word] == nil {
+                    let wordSearchInfo = WordSearchInfoEntity(url: wordEntity.url, line: wordEntity.line, position: wordEntity.position)
+                    wordSearchTypeList[wordEntity.word] = WordSearchEntity(wordSearchInfoList: [wordSearchInfo], word: wordEntity.word)
+                } else {
+                    let wordSearchInfo = WordSearchInfoEntity(url: wordEntity.url, line: wordEntity.line, position: wordEntity.position)
+                    wordSearchTypeList[wordEntity.word]?.wordSearchInfoList.append(wordSearchInfo)
                 }
             case .fileName(let file):
-                if checkTargetDic[file.fileName] == nil {
-                    checkTargetDic[file.fileName] = .fileName(file: file)
+                if fileNameSearchTypeList[file.fileName] == nil {
+                    let fileNameSearchType = FileNameSearchEntity(fileName: file.fileName)
+                    fileNameSearchTypeList[file.fileName] = fileNameSearchType
                 }
             }
         })
-        let filteredCheckList = checkTargetDic.map({ $0.value })
-            .map({ checkType -> CheckType? in
-                switch checkType {
-                case.word(let word):
-                    var checkedWord = word
-                    let range = XcodeSpellChecker.checkSpelling(of: checkedWord.value, startingAt: 0)
-                    if range.location > checkedWord.value.count { return nil }
-                    if let suggestion = XcodeSpellChecker.correction(forWordRange: range, in: checkedWord.value, language: language, inSpellDocumentWithTag: 0) {
-                        checkedWord.suggestion = suggestion
-                    }
-                    return .word(word: checkedWord)
-                case .fileName(let file):
-                    var checkedFileName = file
-                    let range = XcodeSpellChecker.checkSpelling(of: checkedFileName.fileName, startingAt: 0)
-                    if range.location > checkedFileName.fileName.count { return nil }
-                    if let suggestion = XcodeSpellChecker.correction(forWordRange: range, in: checkedFileName.fileName, language: language, inSpellDocumentWithTag: 0) {
-                        checkedFileName.suggestion = suggestion
-                    }
-                    return .fileName(file: checkedFileName)
+        wordSearchTypeList.forEach { (key, value) in
+            let range = XcodeSpellChecker.checkSpelling(of: value.word, startingAt: 0)
+            if range.location > value.word.count { return }
+            let suggestion = XcodeSpellChecker.correction(forWordRange: range, in: value.word, language: language, inSpellDocumentWithTag: 0)
+            value.wordSearchInfoList.forEach({
+                if let suggestionParsed = suggestion {
+                    print("\($0.url.path):\($0.line + 1):\($0.position + 1): warning: Maybe `\(value.word)` is typo of `\(suggestionParsed)`. (XcodeSpellChecker)")
+                } else {
+                    print("\($0.url.path):\($0.line + 1):\($0.position + 1): warning: Is `\(value.word)` typo? (XcodeSpellChecker)")
                 }
             })
-            .compactMap({ $0 })
-        filteredCheckList.forEach { checkType in
-            switch checkType {
-            case .word(let word):
-                if let suggestion = word.suggestion {
-                    print("\(word.url.path):\(word.line + 1):\(word.position + 1): warning: Maybe `\(word.value)` is typo of `\(suggestion)`. (XcodeSpellChecker)")
-                } else {
-                    print("\(word.url.path):\(word.line + 1):\(word.position + 1): warning: Is `\(word.value)` typo? (XcodeSpellChecker)")
-                }
-            case .fileName(let file):
-                if let suggestion = file.suggestion {
-                    print("warning: Is FileName `\(file.fileName)` typo of `\(suggestion)`? (XcodeSpellChecker)")
-                } else {
-                    print("warning: Is FileName `\(file.fileName)` typo? (XcodeSpellChecker)")
-                }
-            }
         }
+        fileNameSearchTypeList.forEach({ (key, value) in
+            let range = XcodeSpellChecker.checkSpelling(of: value.fileName, startingAt: 0)
+            if range.location > value.fileName.count { return }
+            let suggestion = XcodeSpellChecker.correction(forWordRange: range, in: value.fileName, language: language, inSpellDocumentWithTag: 0)
+            if let suggestionParsed = suggestion {
+                print("warning: Is FileName `\(value.fileName)` typo of `\(suggestionParsed)`? (XcodeSpellChecker)")
+            } else {
+                print("warning: Is FileName `\(value.fileName)` typo? (XcodeSpellChecker)")
+            }
+        })
     }
 
     private func parseYaml<T>(for url: URL) -> T? where T: Decodable {
