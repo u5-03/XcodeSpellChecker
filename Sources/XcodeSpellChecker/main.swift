@@ -71,6 +71,7 @@ final class XcodeSpellChecker {
                 }
             }
         })
+        var warningCount = 0
         wordSearchTypeList.forEach { (key, value) in
             let range = XcodeSpellChecker.checkSpelling(of: value.word, startingAt: 0)
             if range.location > value.word.count { return }
@@ -81,6 +82,7 @@ final class XcodeSpellChecker {
                 } else {
                     print("\($0.url.path):\($0.line + 1):\($0.position + 1): warning: Is `\(value.word)` typo? (XcodeSpellChecker)")
                 }
+                warningCount+=1
             })
         }
         fileNameSearchTypeList.forEach({ (key, value) in
@@ -92,7 +94,9 @@ final class XcodeSpellChecker {
             } else {
                 print("warning: Is FileName `\(value.fileName)` typo? (XcodeSpellChecker)")
             }
+            warningCount+=1
         })
+        print("Complete spell checking(Warning count is \(warningCount)). (XcodeSpellChecker)")
     }
 
     private func parseYaml<T>(for url: URL) -> T? where T: Decodable {
