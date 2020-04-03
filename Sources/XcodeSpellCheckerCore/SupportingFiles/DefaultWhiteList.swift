@@ -28,6 +28,8 @@ public struct DefaultWhiteList {
         "sdk",
         "ios",
         "swiftlint",
-        "Hashable"
+        "Hashable",
+        "elseif",
+        "sourcery"
     ]
 }
