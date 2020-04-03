@@ -38,7 +38,7 @@ struct WordFinder {
             if !char.isLetter { return }
             word.append(char)
             if shouldAppendWord(char: char, word: word, index: index), !word.isEmpty {
-                result.append(WordEntity(url: url, line: line, position: index - (word.count - 1), value: word))
+                result.append(WordEntity(url: url, line: line, position: index - (word.count - 1), word: word))
                 word = ""
             }
         })
