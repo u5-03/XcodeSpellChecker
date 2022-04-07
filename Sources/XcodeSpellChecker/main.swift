@@ -7,7 +7,7 @@ import Commander
 final class XcodeSpellChecker {
     func run(filePaths: String, ymlPath: String, language: String) {
         let XcodeSpellChecker = NSSpellChecker.shared
-        var whiteWordList: [String] = []
+        var allowWordList: [String] = []
         var includePath: [String] = []
         var excludePath: [String] = []
         if filePaths.isEmpty {
@@ -20,8 +20,8 @@ final class XcodeSpellChecker {
                 print("XcodeSpellChecker: ⚠️Fail to parse yaml options. Check 'Xcode-spellChecker.yml' file in your project.")
                 return
             }
-            if let whiteList = optionsParameters.whiteList, !whiteList.isEmpty {
-                whiteWordList = whiteList
+            if let allowList = optionsParameters.allowList, !allowList.isEmpty {
+                allowWordList = allowList
             }
             if let optionExcludePath = optionsParameters.excludePath {
                 excludePath = optionExcludePath
@@ -30,7 +30,7 @@ final class XcodeSpellChecker {
                 includePath = optionIncludePath
             }
         }
-        XcodeSpellChecker.setIgnoredWords(whiteWordList + DefaultWhiteList.list, inSpellDocumentWithTag: 0)
+        XcodeSpellChecker.setIgnoredWords(allowWordList + DefaultAllowList.list, inSpellDocumentWithTag: 0)
         let files = Commands.filePathArray(filePaths: filePaths, includePath: includePath, excludePath: excludePath)
         if !XcodeSpellChecker.setLanguage(language) {
             print("XcodeSpellChecker: Language:\(language) is not supported.")

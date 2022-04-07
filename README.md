@@ -79,12 +79,12 @@ mint run XcodeSpellChecker XcodeSpellChecker --yml $SRCROOT/Xcode-spellChecker.y
 
 ### Options
 
-If you want ignore some warnings, make YAML file to your directory and write keywords to `whiteList`.  
+If you want ignore some warnings, make YAML file to your directory and write keywords to `allowList`.  
 And if you want to restrict the scope of checking, write file path or file name to `includePath` and `excludePath`.  
 For example:
 
 ```yaml
-whiteList:
+allowList:
   - PersonName
   - CompanyName
 

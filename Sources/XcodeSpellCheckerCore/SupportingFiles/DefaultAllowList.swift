@@ -1,6 +1,6 @@
 import Foundation
 
-public struct DefaultWhiteList {
+public struct DefaultAllowList {
     public static let list: [String] = [
         "rx",
         "RxSwift",
